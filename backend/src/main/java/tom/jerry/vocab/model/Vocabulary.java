@@ -51,6 +51,7 @@ public class Vocabulary {
     private VocabType vocabType = VocabType.RECOGNITION;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
     @JoinTable(
         name = "vocabulary_tag_relation",
         joinColumns = @JoinColumn(name = "vocabulary_id"),
@@ -67,12 +68,14 @@ public class Vocabulary {
     private String examples; // Stores JSON representation of example sentences
 
     @ManyToMany(mappedBy = "vocabularies", fetch = FetchType.EAGER)
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
     @JsonIgnoreProperties({"vocabularies"})
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<ConnectionGroup> connectionGroups = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
     @JoinTable(
         name = "vocabulary_links",
         joinColumns = @JoinColumn(name = "vocab_id"),
