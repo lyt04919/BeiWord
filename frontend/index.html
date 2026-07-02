@@ -8,6 +8,11 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      window.API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:8080'
+        : 'https://beiword-backend.onrender.com';
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
