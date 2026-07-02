@@ -27,7 +27,7 @@ const selectedWordsToAdd = ref([])
 const fetchGroups = async () => {
   loading.value = true
   try {
-    const res = await fetch('http://localhost:8080/api/connection-groups')
+    const res = await fetch(window.API_BASE_URL + '/api/connection-groups')
     if (res.ok) {
       groups.value = await res.json()
     }
@@ -40,7 +40,7 @@ const fetchGroups = async () => {
 
 const fetchTotalWordsCount = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/vocabularies')
+    const res = await fetch(window.API_BASE_URL + '/api/vocabularies')
     if (res.ok) {
       const data = await res.json()
       totalWordsCount.value = data.length
@@ -72,7 +72,7 @@ const openCreateModal = async () => {
   
   if (allVocabularies.value.length === 0) {
     try {
-      const res = await fetch('http://localhost:8080/api/vocabularies')
+      const res = await fetch(window.API_BASE_URL + '/api/vocabularies')
       if (res.ok) allVocabularies.value = await res.json()
     } catch (e) {
       console.error('Failed to fetch vocabularies', e)
@@ -83,7 +83,7 @@ const openCreateModal = async () => {
 
 const createGroup = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/connection-groups', {
+    const res = await fetch(window.API_BASE_URL + '/api/connection-groups', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -125,7 +125,7 @@ const openEditModal = async (group) => {
   
   if (allVocabularies.value.length === 0) {
     try {
-      const res = await fetch('http://localhost:8080/api/vocabularies')
+      const res = await fetch(window.API_BASE_URL + '/api/vocabularies')
       if (res.ok) allVocabularies.value = await res.json()
     } catch (e) {
       console.error('Failed to fetch vocabularies', e)

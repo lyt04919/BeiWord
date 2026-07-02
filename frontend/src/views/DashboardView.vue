@@ -65,14 +65,14 @@ const fetchDashboardData = async () => {
   loading.value = true
   try {
     // 1. Fetch Review Pool Count
-    const reviewRes = await fetch('http://localhost:8080/api/review/pool')
+    const reviewRes = await fetch(window.API_BASE_URL + '/api/review/pool')
     if (reviewRes.ok) {
       const data = await reviewRes.json()
       dueTodayCount.value = data.length
     }
 
     // 2. Fetch All Vocabularies to get count and random word
-    const vocabRes = await fetch('http://localhost:8080/api/vocabularies')
+    const vocabRes = await fetch(window.API_BASE_URL + '/api/vocabularies')
     if (vocabRes.ok) {
       const data = await vocabRes.json()
       allVocabularies.value = data
@@ -98,7 +98,7 @@ const fetchDashboardData = async () => {
     }
 
     // 3. Fetch All Connection Groups to get count
-    const groupsRes = await fetch('http://localhost:8080/api/connection-groups')
+    const groupsRes = await fetch(window.API_BASE_URL + '/api/connection-groups')
     if (groupsRes.ok) {
       const groupsData = await groupsRes.json()
       totalGroupsCount.value = groupsData.length
@@ -143,7 +143,7 @@ const fetchDashboardData = async () => {
 
 const fetchWallpaper = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/wallpapers/random')
+    const res = await fetch(window.API_BASE_URL + '/api/wallpapers/random')
     if (res.ok && res.status === 200) {
       const blob = await res.blob()
       wallpaperUrl.value = URL.createObjectURL(blob)

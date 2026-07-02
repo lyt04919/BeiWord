@@ -86,20 +86,20 @@ const getNextReviewIntervalText = (wordObj) => {
 const fetchStatsAndPool = async () => {
   try {
     const isLearn = route.query.mode === 'learn'
-    const statsRes = await fetch('http://localhost:8080/api/stats')
+    const statsRes = await fetch(window.API_BASE_URL + '/api/stats')
     if (statsRes.ok) {
       const statsData = await statsRes.json()
       todayReviewedCount.value = statsData.todayWords || 0
     }
 
     if (isLearn) {
-      const vocabRes = await fetch('http://localhost:8080/api/vocabularies')
+      const vocabRes = await fetch(window.API_BASE_URL + '/api/vocabularies')
       if (vocabRes.ok) {
         const vocabData = await vocabRes.json()
         remainingCount.value = vocabData.filter(v => v.currentStage === 0 && !v.isMastered).length
       }
     } else {
-      const poolRes = await fetch('http://localhost:8080/api/review/pool')
+      const poolRes = await fetch(window.API_BASE_URL + '/api/review/pool')
       if (poolRes.ok) {
         const poolData = await poolRes.json()
         remainingCount.value = poolData.length
@@ -118,7 +118,7 @@ const startNextBatch = async () => {
 
 const reportStudyTime = async (seconds) => {
   try {
-    await fetch('http://localhost:8080/api/stats/time', {
+    await fetch(window.API_BASE_URL + '/api/stats/time', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ seconds })
@@ -178,7 +178,7 @@ const handleResult = async ({ id, passed }) => {
     batchTimeSpent.value = batchTotalSeconds.value
 
     try {
-      const vocabRes = await fetch('http://localhost:8080/api/vocabularies')
+      const vocabRes = await fetch(window.API_BASE_URL + '/api/vocabularies')
       if (vocabRes.ok) {
         const allVocabs = await vocabRes.json()
         completedWordsSummary.value = completedWordIds.value.map(cid => allVocabs.find(v => v.id === cid)).filter(Boolean)

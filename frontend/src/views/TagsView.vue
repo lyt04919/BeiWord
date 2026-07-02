@@ -14,7 +14,7 @@ const editTagColor = ref('')
 const fetchTags = async () => {
   loading.value = true
   try {
-    const res = await fetch('http://localhost:8080/api/tags')
+    const res = await fetch(window.API_BASE_URL + '/api/tags')
     if (res.ok) {
       tags.value = await res.json()
     }
@@ -28,7 +28,7 @@ const fetchTags = async () => {
 const addTag = async () => {
   if (!newTagName.value.trim()) return
   try {
-    const res = await fetch('http://localhost:8080/api/tags', {
+    const res = await fetch(window.API_BASE_URL + '/api/tags', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

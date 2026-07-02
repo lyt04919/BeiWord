@@ -107,7 +107,7 @@ const executeBatchDelete = async () => {
   if (!confirm(`Are you sure you want to delete the ${count} selected words?`)) return
   
   try {
-    const res = await fetch('http://localhost:8080/api/vocabularies/batch/delete', {
+    const res = await fetch(window.API_BASE_URL + '/api/vocabularies/batch/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(selectedWordIds.value)
@@ -128,7 +128,7 @@ const executeBatchSetStage = async (stage) => {
   const count = selectedWordIds.value.length
   if (count === 0) return
   try {
-    const res = await fetch('http://localhost:8080/api/vocabularies/batch/set-stage', {
+    const res = await fetch(window.API_BASE_URL + '/api/vocabularies/batch/set-stage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -153,8 +153,8 @@ const executeBatchTagAction = async (tagId, action) => {
   const count = selectedWordIds.value.length
   if (count === 0) return
   const url = action === 'addTag' 
-    ? 'http://localhost:8080/api/vocabularies/batch/add-tag'
-    : 'http://localhost:8080/api/vocabularies/batch/remove-tag'
+    ? window.API_BASE_URL + '/api/vocabularies/batch/add-tag'
+    : window.API_BASE_URL + '/api/vocabularies/batch/remove-tag'
     
   try {
     const res = await fetch(url, {
@@ -181,7 +181,7 @@ const executeBatchTagAction = async (tagId, action) => {
 const fetchVocabularies = async () => {
   loading.value = true
   try {
-    const res = await fetch('http://localhost:8080/api/vocabularies')
+    const res = await fetch(window.API_BASE_URL + '/api/vocabularies')
     if (res.ok) {
       vocabularies.value = await res.json()
     }
@@ -194,7 +194,7 @@ const fetchVocabularies = async () => {
 
 const fetchTags = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/tags')
+    const res = await fetch(window.API_BASE_URL + '/api/tags')
     if (res.ok) {
       allTags.value = await res.json()
     }
@@ -205,7 +205,7 @@ const fetchTags = async () => {
 
 const fetchAllGroups = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/connection-groups')
+    const res = await fetch(window.API_BASE_URL + '/api/connection-groups')
     if (res.ok) {
       allGroups.value = await res.json()
     }
@@ -360,7 +360,7 @@ const saveWord = async () => {
       phoneticUs: fetchedData.value.phoneticUs,
       translation: JSON.stringify({ translations: fetchedData.value.translation.split('\n').filter(t => t.trim() !== '') })
     }
-    const res = await fetch('http://localhost:8080/api/vocabularies', {
+    const res = await fetch(window.API_BASE_URL + '/api/vocabularies', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -461,7 +461,7 @@ const openBatchImportModal = async () => {
   
   if (allGroups.value.length === 0) {
     try {
-      const res = await fetch('http://localhost:8080/api/connection-groups')
+      const res = await fetch(window.API_BASE_URL + '/api/connection-groups')
       if (res.ok) allGroups.value = await res.json()
     } catch (e) {
       console.error('Failed to fetch groups', e)
@@ -497,7 +497,7 @@ const handleBatchImport = async () => {
         vocabType: 'RECOGNITION'
       }
       
-      const res = await fetch('http://localhost:8080/api/vocabularies', {
+      const res = await fetch(window.API_BASE_URL + '/api/vocabularies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -533,7 +533,7 @@ const handleBatchImport = async () => {
 
 const fetchGroups = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/connection-groups')
+    const res = await fetch(window.API_BASE_URL + '/api/connection-groups')
     if (res.ok) {
       allGroups.value = await res.json()
     }

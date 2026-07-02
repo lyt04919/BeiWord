@@ -19,7 +19,7 @@ const loading = ref(true)
 const fetchStats = async () => {
   loading.value = true
   try {
-    const res = await fetch('http://localhost:8080/api/stats')
+    const res = await fetch(window.API_BASE_URL + '/api/stats')
     if (res.ok) {
       stats.value = await res.json()
     }

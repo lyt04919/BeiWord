@@ -139,7 +139,7 @@ const enrichedConnectionGroups = computed(() => {
 
 const fetchTags = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/tags')
+    const res = await fetch(window.API_BASE_URL + '/api/tags')
     if (res.ok) allTags.value = await res.json()
   } catch (e) {
     console.error('Failed to fetch tags', e)
@@ -159,7 +159,7 @@ const createNewTag = async () => {
   if (!newTagName.value.trim()) return
   try {
     const hex = Math.floor(Math.random()*16777215).toString(16)
-    const res = await fetch('http://localhost:8080/api/tags', {
+    const res = await fetch(window.API_BASE_URL + '/api/tags', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: newTagName.value.trim(), color: '#' + hex.padStart(6, '0') })
@@ -225,7 +225,7 @@ const removeTag = async (tagId) => {
 const openGroupModal = async () => {
   if (allVocabularies.value.length === 0) {
     try {
-      const res = await fetch('http://localhost:8080/api/vocabularies')
+      const res = await fetch(window.API_BASE_URL + '/api/vocabularies')
       if (res.ok) allVocabularies.value = await res.json()
     } catch (e) {
       console.error('Failed to fetch vocabularies', e)
@@ -237,7 +237,7 @@ const openGroupModal = async () => {
 
 const openJoinGroupModal = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/connection-groups')
+    const res = await fetch(window.API_BASE_URL + '/api/connection-groups')
     if (res.ok) {
       const groups = await res.json()
       const currentGroupIds = (vocabulary.value.connectionGroups || []).map(g => g.id)
@@ -261,7 +261,7 @@ const toggleWordForGroup = (id) => {
 
 const createGroupWithSelectedWords = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/connection-groups', {
+    const res = await fetch(window.API_BASE_URL + '/api/connection-groups', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -319,7 +319,7 @@ const removeFromGroup = async (groupId) => {
 const fetchAllVocabularies = async () => {
   if (allVocabularies.value.length > 0) return
   try {
-    const res = await fetch('http://localhost:8080/api/vocabularies')
+    const res = await fetch(window.API_BASE_URL + '/api/vocabularies')
     if (res.ok) allVocabularies.value = await res.json()
   } catch (e) { console.error('Failed to fetch vocabularies', e) }
 }
