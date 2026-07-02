@@ -1,0 +1,30 @@
+# System files
+.DS_Store
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Backend build and database files
+backend/target/
+backend/data/
+backend/*.db
+backend/.mvn/
+
+# Frontend build and dependency files
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# OS specific files
+Thumbs.db
+ehthumbs.db
+
+# macOS Apps
+BeiWordLauncher.app/
