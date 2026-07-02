@@ -94,7 +94,7 @@ const parseTranslation = (raw, separator = '\n') => {
 
 const fetchWordDetails = async () => {
   try {
-    const res = await fetch(`http://localhost:8080/api/vocabularies`)
+    const res = await fetch(`${window.API_BASE_URL}/api/vocabularies`)
     if (res.ok) {
       const allWords = await res.json()
       allVocabularies.value = allWords
@@ -189,7 +189,7 @@ const startEditTag = (tag) => {
 const saveTagEdit = async () => {
   if (!editingTagName.value.trim() || !editingTagId.value) return
   try {
-    const res = await fetch(`http://localhost:8080/api/tags/${editingTagId.value}`, {
+    const res = await fetch(`${window.API_BASE_URL}/api/tags/${editingTagId.value}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: editingTagName.value.trim(), color: editingTagColor.value })
@@ -287,7 +287,7 @@ const createGroupWithSelectedWords = async () => {
 
 const joinExistingGroup = async (groupId) => {
   try {
-    const res = await fetch(`http://localhost:8080/api/connection-groups/${groupId}/vocabularies/${vocabulary.value.id}`, {
+    const res = await fetch(`${window.API_BASE_URL}/api/connection-groups/${groupId}/vocabularies/${vocabulary.value.id}`, {
       method: 'POST'
     })
     if (res.ok) {
@@ -303,7 +303,7 @@ const joinExistingGroup = async (groupId) => {
 
 const removeFromGroup = async (groupId) => {
   try {
-    const res = await fetch(`http://localhost:8080/api/connection-groups/${groupId}/vocabularies/${vocabulary.value.id}`, {
+    const res = await fetch(`${window.API_BASE_URL}/api/connection-groups/${groupId}/vocabularies/${vocabulary.value.id}`, {
       method: 'DELETE'
     })
     if (res.ok) {
@@ -331,7 +331,7 @@ const openLinkWordModal = () => {
 
 const linkWord = async (linkedId) => {
   try {
-    const res = await fetch(`http://localhost:8080/api/vocabularies/${vocabulary.value.id}/links/${linkedId}`, { method: 'POST' })
+    const res = await fetch(`${window.API_BASE_URL}/api/vocabularies/${vocabulary.value.id}/links/${linkedId}`, { method: 'POST' })
     if (res.ok) {
       await fetchWordDetails()
       searchLinkWordQuery.value = ''
@@ -342,7 +342,7 @@ const linkWord = async (linkedId) => {
 const unlinkWord = async (linkedId) => {
   if (!confirm('Remove this link?')) return
   try {
-    const res = await fetch(`http://localhost:8080/api/vocabularies/${vocabulary.value.id}/links/${linkedId}`, { method: 'DELETE' })
+    const res = await fetch(`${window.API_BASE_URL}/api/vocabularies/${vocabulary.value.id}/links/${linkedId}`, { method: 'DELETE' })
     if (res.ok) {
       await fetchWordDetails()
     }
@@ -357,7 +357,7 @@ const saveChanges = async () => {
     const payload = { ...vocabulary.value }
     payload.translation = JSON.stringify({ translations: payload.translation.split('\n').filter(t => t.trim() !== '') })
     
-    const res = await fetch(`http://localhost:8080/api/vocabularies/${payload.id}`, {
+    const res = await fetch(`${window.API_BASE_URL}/api/vocabularies/${payload.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

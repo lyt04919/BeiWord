@@ -141,13 +141,13 @@ const openEditModal = async (group) => {
 
 const updateGroup = async () => {
   try {
-    const nameRes = await fetch(`http://localhost:8080/api/connection-groups/${editGroupId.value}`, {
+    const nameRes = await fetch(`${window.API_BASE_URL}/api/connection-groups/${editGroupId.value}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: editGroupName.value.trim() || null })
     })
     
-    const wordsRes = await fetch(`http://localhost:8080/api/connection-groups/${editGroupId.value}/vocabularies`, {
+    const wordsRes = await fetch(`${window.API_BASE_URL}/api/connection-groups/${editGroupId.value}/vocabularies`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(selectedWordsToAdd.value)
@@ -169,7 +169,7 @@ const updateGroup = async () => {
 const deleteGroup = async (id) => {
   if (!confirm('Are you sure you want to delete this group? The words will remain in your dictionary.')) return
   try {
-    const res = await fetch(`http://localhost:8080/api/connection-groups/${id}`, { method: 'DELETE' })
+    const res = await fetch(`${window.API_BASE_URL}/api/connection-groups/${id}`, { method: 'DELETE' })
     if (res.ok) {
       await fetchGroups()
       success('Group deleted')

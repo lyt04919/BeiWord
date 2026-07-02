@@ -137,7 +137,7 @@ const fetchBatch = async () => {
   loading.value = true
   try {
     const mode = route.query.mode || 'review'
-    const res = await fetch(`http://localhost:8080/api/review/batch?mode=${mode}`)
+    const res = await fetch(`${window.API_BASE_URL}/api/review/batch?mode=${mode}`)
     if (res.ok) {
       reviewBatch.value = await res.json()
       initialBatchSize.value = reviewBatch.value.length
@@ -155,7 +155,7 @@ const fetchBatch = async () => {
 
 const handleResult = async ({ id, passed }) => {
   try {
-    await fetch(`http://localhost:8080/api/review/${id}/result?passed=${passed}`, {
+    await fetch(`${window.API_BASE_URL}/api/review/${id}/result?passed=${passed}`, {
       method: 'POST'
     })
   } catch (e) {

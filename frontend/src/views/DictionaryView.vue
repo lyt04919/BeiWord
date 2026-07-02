@@ -306,7 +306,7 @@ const fetchWordInfo = async () => {
   if (isSpelling) w = w.slice(0, -1)
 
   try {
-    const res = await fetch(`http://localhost:8080/api/vocabularies/fetch-info?word=${encodeURIComponent(w)}`)
+    const res = await fetch(`${window.API_BASE_URL}/api/vocabularies/fetch-info?word=${encodeURIComponent(w)}`)
     if (res.ok) {
       const data = await res.json()
       let trans = ''
@@ -371,12 +371,12 @@ const saveWord = async () => {
       
       // Assign selected tags
       for (const tagId of selectedNewTags.value) {
-        await fetch(`http://localhost:8080/api/vocabularies/${newWord.id}/tags/${tagId}`, { method: 'POST' })
+        await fetch(`${window.API_BASE_URL}/api/vocabularies/${newWord.id}/tags/${tagId}`, { method: 'POST' })
       }
       
       // Assign selected groups
       for (const groupId of selectedNewGroups.value) {
-        await fetch(`http://localhost:8080/api/connection-groups/${groupId}/vocabularies/${newWord.id}`, { method: 'POST' })
+        await fetch(`${window.API_BASE_URL}/api/connection-groups/${groupId}/vocabularies/${newWord.id}`, { method: 'POST' })
       }
       
       success('Word saved successfully')
@@ -423,7 +423,7 @@ const cancelAdd = () => {
 const deleteWord = async (id) => {
   if (!confirm('Are you sure you want to delete this word?')) return
   try {
-    await fetch(`http://localhost:8080/api/vocabularies/${id}`, { method: 'DELETE' })
+    await fetch(`${window.API_BASE_URL}/api/vocabularies/${id}`, { method: 'DELETE' })
     await fetchVocabularies()
     if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
   } catch (e) {
@@ -507,11 +507,11 @@ const handleBatchImport = async () => {
         const newWord = await res.json()
         
         for (const tagId of selectedImportTags.value) {
-          await fetch(`http://localhost:8080/api/vocabularies/${newWord.id}/tags/${tagId}`, { method: 'POST' })
+          await fetch(`${window.API_BASE_URL}/api/vocabularies/${newWord.id}/tags/${tagId}`, { method: 'POST' })
         }
         
         for (const groupId of selectedImportGroups.value) {
-          await fetch(`http://localhost:8080/api/connection-groups/${groupId}/vocabularies/${newWord.id}`, { method: 'POST' })
+          await fetch(`${window.API_BASE_URL}/api/connection-groups/${groupId}/vocabularies/${newWord.id}`, { method: 'POST' })
         }
         
         successCount++

@@ -54,7 +54,7 @@ const startEdit = (tag) => {
 
 const saveEdit = async (id) => {
   try {
-    const res = await fetch(`http://localhost:8080/api/tags/${id}`, {
+    const res = await fetch(`${window.API_BASE_URL}/api/tags/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -78,7 +78,7 @@ const cancelEdit = () => {
 const deleteTag = async (id) => {
   if (!confirm('Are you sure you want to delete this tag? It will be removed from all vocabularies.')) return
   try {
-    const res = await fetch(`http://localhost:8080/api/tags/${id}`, {
+    const res = await fetch(`${window.API_BASE_URL}/api/tags/${id}`, {
       method: 'DELETE'
     })
     if (res.ok) {
