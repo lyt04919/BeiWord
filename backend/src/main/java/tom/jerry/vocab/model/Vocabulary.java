@@ -31,7 +31,7 @@ public class Vocabulary {
     @Column(name = "phonetic_us")
     private String phoneticUs;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String translation; // Stores JSON representation of translations
 
     @Column(name = "current_stage", nullable = false)
@@ -63,7 +63,7 @@ public class Vocabulary {
     @Column(columnDefinition = "TEXT")
     private String phrases; // Stores JSON or plain text for custom phrases
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String examples; // Stores JSON representation of example sentences
 
     @ManyToMany(mappedBy = "vocabularies", fetch = FetchType.EAGER)
