@@ -367,6 +367,18 @@ const saveWord = async () => {
     })
     
     if (res.ok) {
+      if (payload.vocabType === 'SPELLING') {
+        const fetchRes = await fetch(`${window.API_BASE_URL}/api/vocabularies/fetch-info?word=${encodeURIComponent(payload.word)}`)
+        if (fetchRes.ok) {
+          const fetchedData = await fetchRes.json()
+          payload.phoneticUk = fetchedData.phoneticUk || ''
+          payload.phoneticUs = fetchedData.phoneticUs || ''
+          if (fetchedData.translations) {
+            payload.translation = JSON.stringify({ translations: fetchedData.translations })
+          }
+        }
+      }
+      
       const newWord = await res.json()
       
       // Assign selected tags
@@ -400,6 +412,8 @@ const saveWord = async () => {
         selectedNewTags.value = []
         selectedNewGroups.value = []
       }
+    } else if (res.status === 409) {
+      error(`单词 "${payload.word}" 已经存在`)
     } else {
       const err = await res.json()
       error(err.message || 'Failed to save word')

@@ -63,7 +63,7 @@ public class VocabularyController {
         
         // Check for duplicates
         if (vocabularyRepository.findByWord(vocabulary.getWord()).isPresent()) {
-            return ResponseEntity.ok(vocabularyRepository.findByWord(vocabulary.getWord()).get()); // Or return a specific conflict response
+            return ResponseEntity.status(409).body(null);
         }
 
         // Priority 1: Fetch from Youdao

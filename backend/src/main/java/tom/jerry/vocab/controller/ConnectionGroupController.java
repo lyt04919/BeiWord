@@ -37,6 +37,9 @@ public class ConnectionGroupController {
         
         if (payload.containsKey("name") && payload.get("name") != null) {
             String name = payload.get("name").toString().trim();
+            if (!name.isEmpty() && connectionGroupRepository.findByName(name).isPresent()) {
+                return ResponseEntity.status(409).body(null);
+            }
             group.setName(name);
         } else {
             group.setName("");
@@ -70,11 +73,13 @@ public class ConnectionGroupController {
         ConnectionGroup group = opt.get();
         if (payload.containsKey("name")) {
             Object nameObj = payload.get("name");
-            if (nameObj == null || nameObj.toString().trim().isEmpty()) {
-                group.setName("");
-            } else {
-                group.setName(nameObj.toString().trim());
+            String newName = nameObj != null ? nameObj.toString().trim() : "";
+            
+            if (!newName.isEmpty() && !newName.equals(group.getName()) && connectionGroupRepository.findByName(newName).isPresent()) {
+                return ResponseEntity.status(409).body(null);
             }
+            
+            group.setName(newName);
         }
         return ResponseEntity.ok(connectionGroupRepository.save(group));
     }

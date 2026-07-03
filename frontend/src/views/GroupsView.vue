@@ -92,11 +92,15 @@ const createGroup = async () => {
       })
     })
     if (res.ok) {
+      await fetchGroups()
+      success('Group created')
       showCreateModal.value = false
       newGroupName.value = ''
       newGroupWordIds.value = []
-      await fetchGroups()
-      success('Group created successfully')
+    } else if (res.status === 409) {
+      error(`分组 "${newGroupName.value.trim()}" 已经存在`)
+    } else {
+      error('Failed to create group')
     }
   } catch (e) {
     console.error('Failed to create group', e)
@@ -154,9 +158,11 @@ const updateGroup = async () => {
     })
     
     if (nameRes.ok && wordsRes.ok) {
-      showEditModal.value = false
       await fetchGroups()
-      success('Group updated successfully')
+      success('Group updated')
+      showEditModal.value = false
+    } else if (nameRes.status === 409) {
+      error(`分组 "${editGroupName.value.trim()}" 已经存在`)
     } else {
       error('Failed to update group')
     }
