@@ -200,6 +200,9 @@ const handleGlobalKeydown = (e) => {
   if (e.key === 'Escape') {
     router.push('/')
   }
+  if (e.key === 'Enter' && showBatchSummary.value) {
+    startNextBatch()
+  }
 }
 
 onMounted(() => {
