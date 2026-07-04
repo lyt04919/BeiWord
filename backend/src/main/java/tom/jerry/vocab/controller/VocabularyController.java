@@ -15,6 +15,20 @@ import java.util.Map;
 import java.util.Optional;
 import tom.jerry.vocab.service.LocalDictService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.CSVPrinter;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+import tom.jerry.vocab.model.Tag;
 
 @RestController
 @RequestMapping("/api/vocabularies")
@@ -41,6 +55,116 @@ public class VocabularyController {
     @GetMapping
     public List<Vocabulary> getAllVocabularies() {
         return vocabularyRepository.findAll();
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<String> exportVocabularies() {
+        List<Vocabulary> allVocabs = vocabularyRepository.findAll();
+        StringWriter sw = new StringWriter();
+        try (CSVPrinter printer = new CSVPrinter(sw, CSVFormat.DEFAULT.builder().setHeader("Word", "Translation", "Phonetic_UK", "Phonetic_US", "Tags").build())) {
+            for (Vocabulary v : allVocabs) {
+                String tagsStr = v.getTags() != null ? v.getTags().stream().map(Tag::getName).collect(Collectors.joining(";")) : "";
+                printer.printRecord(v.getWord(), v.getTranslation(), v.getPhoneticUk(), v.getPhoneticUs(), tagsStr);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+        headers.setContentDispositionFormData("attachment", "beiword_export.csv");
+        
+        // Add BOM for Excel UTF-8 compatibility
+        String csvContent = "\ufeff" + sw.toString();
+        
+        return new ResponseEntity<>(csvContent, headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<Map<String, Object>> importVocabularies(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) return ResponseEntity.badRequest().build();
+        
+        int successCount = 0;
+        int duplicateCount = 0;
+        
+        try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).setIgnoreHeaderCase(true).setTrim(true).build())) {
+             
+            Map<String, Integer> headerMap = csvParser.getHeaderMap();
+            boolean hasTranslation = headerMap != null && headerMap.containsKey("Translation");
+            boolean hasTags = headerMap != null && headerMap.containsKey("Tags");
+            boolean hasPhoneticUk = headerMap != null && headerMap.containsKey("Phonetic_UK");
+            boolean hasPhoneticUs = headerMap != null && headerMap.containsKey("Phonetic_US");
+            
+            for (CSVRecord record : csvParser) {
+                String word = headerMap != null && headerMap.containsKey("Word") ? record.get("Word") : (record.size() > 0 ? record.get(0) : null);
+                if (word == null || word.trim().isEmpty()) continue;
+                word = word.trim();
+                
+                if (vocabularyRepository.findByWord(word).isPresent()) {
+                    duplicateCount++;
+                    continue;
+                }
+                
+                Vocabulary v = new Vocabulary();
+                v.setWord(word);
+                
+                String translation = hasTranslation && record.isMapped("Translation") ? record.get("Translation") : null;
+                
+                if (translation == null || translation.trim().isEmpty()) {
+                    Map<String, Object> dictData = localDictService.fetchWordInfo(word);
+                    if (dictData != null) {
+                        v.setPhoneticUk((String) dictData.get("phoneticUk"));
+                        v.setPhoneticUs((String) dictData.get("phoneticUs"));
+                        if (dictData.get("translations") != null) {
+                            Map<String, Object> transMap = new HashMap<>();
+                            transMap.put("translations", dictData.get("translations"));
+                            v.setTranslation(objectMapper.writeValueAsString(transMap));
+                        }
+                    }
+                } else {
+                    v.setTranslation(translation);
+                    if (hasPhoneticUk && record.isMapped("Phonetic_UK")) v.setPhoneticUk(record.get("Phonetic_UK"));
+                    if (hasPhoneticUs && record.isMapped("Phonetic_US")) v.setPhoneticUs(record.get("Phonetic_US"));
+                }
+                
+                v = vocabularyRepository.save(v); // Save to get ID
+                
+                if (hasTags && record.isMapped("Tags")) {
+                    String tagsStr = record.get("Tags");
+                    if (tagsStr != null && !tagsStr.trim().isEmpty()) {
+                        String[] tagNames = tagsStr.split(";");
+                        for (String tagName : tagNames) {
+                            tagName = tagName.trim();
+                            if (!tagName.isEmpty()) {
+                                Optional<Tag> optTag = tagRepository.findByName(tagName);
+                                Tag tag;
+                                if (optTag.isPresent()) {
+                                    tag = optTag.get();
+                                } else {
+                                    tag = new Tag();
+                                    tag.setName(tagName);
+                                    tag.setColor("#6366f1");
+                                    tag = tagRepository.save(tag);
+                                }
+                                v.getTags().add(tag);
+                            }
+                        }
+                        vocabularyRepository.save(v);
+                    }
+                }
+                successCount++;
+            }
+        } catch (Exception e) {
+            Map<String, Object> res = new HashMap<>();
+            res.put("error", e.getMessage());
+            return ResponseEntity.internalServerError().body(res);
+        }
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("successCount", successCount);
+        response.put("duplicateCount", duplicateCount);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/fetch-info")

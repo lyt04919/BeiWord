@@ -50,6 +50,7 @@ const selectedImportGroups = ref([])
 const isImporting = ref(false)
 const importProgress = ref(0)
 const importTotal = ref(0)
+const csvFileInput = ref(null)
 
 const toggleReveal = (wordId) => {
   if (revealedWords.value.has(wordId)) {
@@ -556,6 +557,47 @@ const fetchGroups = async () => {
   }
 }
 
+const exportCsv = () => {
+  window.location.href = window.API_BASE_URL + '/api/vocabularies/export'
+}
+
+const handleCsvImport = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+  
+  const formData = new FormData()
+  formData.append('file', file)
+  
+  isImporting.value = true
+  // Show a toast message to indicate import has started since it might take a few seconds
+  success('Importing CSV... Please wait.')
+  
+  try {
+    const res = await fetch(window.API_BASE_URL + '/api/vocabularies/import', {
+      method: 'POST',
+      body: formData
+    })
+    
+    if (res.ok) {
+      const data = await res.json()
+      success(`CSV Imported! Added ${data.successCount} words. Skipped ${data.duplicateCount} duplicates.`)
+      await fetchVocabularies()
+    } else {
+      const err = await res.json()
+      error(err.error || 'Failed to import CSV')
+    }
+  } catch (e) {
+    console.error('CSV import failed', e)
+    error('Network error during import')
+  } finally {
+    isImporting.value = false
+    // Reset file input
+    if (csvFileInput.value) {
+      csvFileInput.value.value = ''
+    }
+  }
+}
+
 onMounted(() => {
   fetchVocabularies()
   fetchTags()
@@ -565,6 +607,9 @@ onMounted(() => {
 
 <template>
   <div>
+    <!-- Hidden file input for CSV -->
+    <input type="file" ref="csvFileInput" accept=".csv" class="hidden" @change="handleCsvImport" />
+    
     <div class="w-full max-w-5xl mx-auto flex flex-col gap-6 px-4 pb-20 select-none">
     
     <!-- Header Block -->
@@ -620,7 +665,20 @@ onMounted(() => {
               <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
-              Batch Import
+              Batch Text
+            </button>
+            <div class="my-1 border-t border-zinc-100 dark:border-zinc-700"></div>
+            <button @click="csvFileInput.click()" class="px-3 py-2.5 text-left text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-xl flex items-center gap-2.5 transition-colors">
+              <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              Import CSV
+            </button>
+            <button @click="exportCsv" class="px-3 py-2.5 text-left text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-xl flex items-center gap-2.5 transition-colors">
+              <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export CSV
             </button>
           </div>
         </div>
