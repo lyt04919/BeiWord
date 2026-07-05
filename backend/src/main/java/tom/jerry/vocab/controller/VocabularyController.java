@@ -275,6 +275,9 @@ public class VocabularyController {
         if (vocabulary.getIsMastered() == null) {
             vocabulary.setIsMastered(false);
         }
+        if (vocabulary.getAddCount() == null) {
+            vocabulary.setAddCount(1);
+        }
         
         Vocabulary saved = vocabularyRepository.save(vocabulary);
         
