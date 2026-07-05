@@ -485,9 +485,14 @@ watch(() => route.params.id, async (newId) => {
               </button>
             </div>
             
-            <span v-else class="text-[10px] font-black text-zinc-400 tracking-wider">
-              {{ vocabulary.vocabType }}
-            </span>
+            <div v-else class="flex items-center gap-2">
+              <span v-if="vocabulary.addCount > 1" class="text-[10px] font-black text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30 px-2.5 py-1 rounded-lg border border-orange-200 dark:border-orange-800">
+                🔥 遗忘 {{ vocabulary.addCount }} 次
+              </span>
+              <span class="text-[10px] font-black text-zinc-400 tracking-wider">
+                {{ vocabulary.vocabType }}
+              </span>
+            </div>
           </div>
         </div>
 

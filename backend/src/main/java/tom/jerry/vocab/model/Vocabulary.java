@@ -46,6 +46,9 @@ public class Vocabulary {
     @Column(name = "is_mastered", nullable = false)
     private Boolean isMastered = false;
 
+    @Column(name = "add_count", nullable = false)
+    private Integer addCount = 1;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "vocab_type", nullable = false)
     private VocabType vocabType = VocabType.RECOGNITION;

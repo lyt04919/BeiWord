@@ -101,7 +101,13 @@ public class VocabularyController {
                 if (word == null || word.trim().isEmpty()) continue;
                 word = word.trim();
                 
-                if (vocabularyRepository.findByWord(word).isPresent()) {
+                Optional<Vocabulary> existingOpt = vocabularyRepository.findByWord(word);
+                if (existingOpt.isPresent()) {
+                    Vocabulary existing = existingOpt.get();
+                    existing.setAddCount(existing.getAddCount() + 1);
+                    existing.setCurrentStage(0);
+                    existing.setIsMastered(false);
+                    vocabularyRepository.save(existing);
                     duplicateCount++;
                     continue;
                 }
@@ -186,8 +192,14 @@ public class VocabularyController {
         }
         
         // Check for duplicates
-        if (vocabularyRepository.findByWord(vocabulary.getWord()).isPresent()) {
-            return ResponseEntity.status(409).body(null);
+        Optional<Vocabulary> existingOpt = vocabularyRepository.findByWord(vocabulary.getWord());
+        if (existingOpt.isPresent()) {
+            Vocabulary existing = existingOpt.get();
+            existing.setAddCount(existing.getAddCount() + 1);
+            existing.setCurrentStage(0);
+            existing.setIsMastered(false);
+            vocabularyRepository.save(existing);
+            return ResponseEntity.ok(existing);
         }
 
         // Priority 1: Fetch from Youdao

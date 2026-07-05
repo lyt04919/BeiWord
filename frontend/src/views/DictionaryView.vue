@@ -281,6 +281,8 @@ const filteredAndSortedVocabularies = computed(() => {
       return a.word.localeCompare(b.word)
     } else if (sortBy.value === 'mastery') {
       return (a.isMastered === b.isMastered) ? 0 : a.isMastered ? -1 : 1
+    } else if (sortBy.value === 'forget') {
+      return (b.addCount || 1) - (a.addCount || 1)
     }
     return b.id - a.id
   })
@@ -392,7 +394,12 @@ const saveWord = async () => {
         await fetch(`${window.API_BASE_URL}/api/connection-groups/${groupId}/vocabularies/${newWord.id}`, { method: 'POST' })
       }
       
-      success('Word saved successfully')
+      if (newWord.addCount > 1) {
+        success(`🔥 该单词已在词库中！这是你第 ${newWord.addCount} 次添加它，已为你重置记忆曲线！`)
+      } else {
+        success('Word saved successfully')
+      }
+      
       await fetchVocabularies()
       
       if (keepModalOpen.value) {
@@ -413,8 +420,6 @@ const saveWord = async () => {
         selectedNewTags.value = []
         selectedNewGroups.value = []
       }
-    } else if (res.status === 409) {
-      error(`单词 "${payload.word}" 已经存在`)
     } else {
       const err = await res.json()
       error(err.message || 'Failed to save word')
@@ -768,6 +773,7 @@ onMounted(() => {
           <option value="recent">Recently Added</option>
           <option value="az">Alphabetical A-Z</option>
           <option value="mastery">Mastery Stage</option>
+          <option value="forget">Forgot Count (🔥)</option>
         </select>
       </div>
     </div>
@@ -845,6 +851,11 @@ onMounted(() => {
               <!-- Phonetics -->
               <span v-if="v.phoneticUk || v.phoneticUs" class="text-xs font-mono text-zinc-400 dark:text-zinc-500 mt-0.5">
                 /{{ v.phoneticUk || v.phoneticUs }}/
+              </span>
+              
+              <!-- Add Count Badge -->
+              <span v-if="v.addCount > 1" class="text-[10px] font-black text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30 px-2 py-0.5 rounded-full mt-1.5 w-fit border border-orange-200 dark:border-orange-800 flex items-center gap-1">
+                🔥 遗忘 {{ v.addCount }} 次
               </span>
             </div>
 
