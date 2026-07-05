@@ -46,7 +46,7 @@ public class Vocabulary {
     @Column(name = "is_mastered", nullable = false)
     private Boolean isMastered = false;
 
-    @Column(name = "add_count", nullable = false)
+    @Column(name = "add_count", nullable = false, columnDefinition = "integer default 1")
     private Integer addCount = 1;
 
     @Enumerated(EnumType.STRING)
